@@ -1,5 +1,12 @@
 <template>
   <view>
+    <!-- 使用自定义的搜索组件 -->
+    <!-- <my-search :bgColor="'pink'" :radius="3"></my-search> -->
+    <!-- 自定义组件并未实现 Click 事件，所以这里@click 并不会起作用 -->
+    <!-- 自定义组件的最外层是 view， view 实现了 click 事件，在view的click事件方法中 调用this.$emit('自定义事件名')，即可触发这里的自定义事件。例如：click，切记这里的 click 不是平常所用的点击事件，而是自定义的事件，可以任意起名 -->
+    <my-search @click="gotoSearch"></my-search>
+    
+    <!-- 主体区域 -->
     <view class="scroll-view-container">
       <!-- 左 -->
       <scroll-view class="left-scroll-view" scroll-y="true" :style="{height: wh + 'px'}" >
@@ -48,13 +55,13 @@
     async onLoad() {
       // 获取系统信息，系统信息里有 可使用窗口高度 windowHeight
       const sysInfo = await uni.getSystemInfo()
-      this.wh = sysInfo.windowHeight
+      this.wh = sysInfo.windowHeight - 50 // 搜索栏高度 50
       this.getCateList()
     },
     methods: {
       async getCateList () {
         const { data: res } = await uni.$http.get('/api/public/v1/categories')
-        console.log(res);
+        // console.log(res);
         if (res.meta.status !== 200) return uni.$showMsg()
         
         // 一级分类
@@ -76,6 +83,12 @@
         console.log(item);
         uni.navigateTo({
           url: '/subpkg/goods_list/goods_list?cid=' + item.cat_id
+        })
+      },
+      gotoSearch () {
+        // console.log('cate');
+        uni.navigateTo({
+          url: '/subpkg/search/search'
         })
       }
     }
