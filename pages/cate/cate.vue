@@ -5,20 +5,21 @@
     <!-- 自定义组件并未实现 Click 事件，所以这里@click 并不会起作用 -->
     <!-- 自定义组件的最外层是 view， view 实现了 click 事件，在view的click事件方法中 调用this.$emit('自定义事件名')，即可触发这里的自定义事件。例如：click，切记这里的 click 不是平常所用的点击事件，而是自定义的事件，可以任意起名 -->
     <my-search @click="gotoSearch"></my-search>
-    
+
     <!-- 主体区域 -->
     <view class="scroll-view-container">
       <!-- 左 -->
-      <scroll-view class="left-scroll-view" scroll-y="true" :style="{height: wh + 'px'}" >
+      <scroll-view class="left-scroll-view" scroll-y="true" :style="{height: wh + 'px'}">
         <block v-for="(item, index) in cateList" :key="item.cat_id">
           <!-- 一级分类 -->
-          <view :class="['left-scroll-view-item', index === active ? 'active' : '']" @click="activeChange(index)">{{ item.cat_name }}</view>
+          <view :class="['left-scroll-view-item', index === active ? 'active' : '']" @click="activeChange(index)">
+            {{ item.cat_name }}</view>
         </block>
       </scroll-view>
-      
+
       <!-- 右 -->
       <scroll-view scroll-y="true" :style="{height: wh + 'px'}">
-      <!-- <scroll-view scroll-y="true" :style="{height: wh + 'px'}" :scroll-top="scrollTop"> -->
+        <!-- <scroll-view scroll-y="true" :style="{height: wh + 'px'}" :scroll-top="scrollTop"> -->
         <view class="cate-lv2" v-for="item2 in cateLevel2" :key="item2.cat_id">
           <!-- 二级分类 -->
           <view class="cate-lv2-title">
@@ -27,7 +28,8 @@
           <!-- 三级分类 -->
           <view class="cate-lv3-list">
             <!-- 三级分类的 item 项 -->
-            <view class="cate-lv3-item" v-for="item3 in item2.children" :key="item2.cat_id" @click="gotoGoodsList(item3)">
+            <view class="cate-lv3-item" v-for="item3 in item2.children" :key="item2.cat_id"
+              @click="gotoGoodsList(item3)">
               <!-- 三级分类的图片 -->
               <image :src="item3.cat_icon"></image>
               <!-- 三级分类的文本 -->
@@ -36,13 +38,15 @@
           </view>
         </view>
       </scroll-view>
-      
+
     </view>
   </view>
 </template>
 
 <script>
+  import badgeMix from '@/mixins/tabbar-badge.js'
   export default {
+    mixins: [badgeMix],
     data() {
       return {
         wh: 0, // 当前设备可用的高度
@@ -59,11 +63,13 @@
       this.getCateList()
     },
     methods: {
-      async getCateList () {
-        const { data: res } = await uni.$http.get('/api/public/v1/categories')
+      async getCateList() {
+        const {
+          data: res
+        } = await uni.$http.get('/api/public/v1/categories')
         // console.log(res);
         if (res.meta.status !== 200) return uni.$showMsg()
-        
+
         // 一级分类
         this.cateList = res.message
         // 二级分类（默认）
@@ -72,10 +78,10 @@
       // 改变一级分类
       activeChange(index) {
         this.active = index
-        
+
         // 重新为二级分类赋值
         this.cateLevel2 = this.cateList[index].children
-        
+
         // this.scrollTop = this.scrollTop === 0 ? 1 : 0
       },
       // 跳转到商品列表页面
@@ -85,7 +91,7 @@
           url: '/subpkg/goods_list/goods_list?cid=' + item.cat_id
         })
       },
-      gotoSearch () {
+      gotoSearch() {
         // console.log('cate');
         uni.navigateTo({
           url: '/subpkg/search/search'
@@ -99,21 +105,24 @@
   page {
     background-color: #fff;
   }
+
   .scroll-view-container {
     display: flex;
-    
+
     // 左
     .left-scroll-view {
       width: 120px;
-      
+
       .left-scroll-view-item {
         background-color: #f7f7f7;
         line-height: 60px;
         text-align: center;
         font-size: 12px;
+
         &.active {
           position: relative;
           background-color: #fff;
+
           &::before {
             position: absolute;
             content: '';
@@ -128,7 +137,7 @@
         }
       }
     }
-    
+
     // 右
     .cate-lv2-title {
       font-size: 12px;
@@ -136,10 +145,11 @@
       text-align: center;
       padding: 15px 0;
     }
-    
+
     .cate-lv3-list {
       display: flex;
       flex-wrap: wrap;
+
       .cate-lv3-item {
         display: flex;
         flex-direction: column;
@@ -147,10 +157,12 @@
         align-items: center;
         width: 33.33%;
         margin-bottom: 10px;
+
         image {
           width: 60px;
           height: 60px;
         }
+
         text {
           font-size: 12px;
         }

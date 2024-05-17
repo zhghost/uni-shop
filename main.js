@@ -1,3 +1,4 @@
+import store from './store'
 // 两点注意：
 // 1. 网络请求的代码不能放在 if 和 endif 之间，就连注释都不能乱写 if 和 endif
 // 2. baseUrl 地址后面不能写 /，因为请求的时候已经写了 /
@@ -37,16 +38,20 @@ Vue.config.productionTip = false
 App.mpType = 'app'
 
 const app = new Vue({
-    ...App
+    ...App,
+    store
 })
 app.$mount()
 // #endif
+
+
 
 // #ifdef VUE3
 import { createSSRApp } from 'vue'
 import App from './App.vue'
 export function createApp() {
-  const app = createSSRApp(App)
+  const app = createSSRApp(App, store)
+  app.use(store)
   return {
     app
   }

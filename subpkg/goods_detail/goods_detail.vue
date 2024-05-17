@@ -47,7 +47,39 @@
 </template>
 
 <script>
+  import {
+    mapState,
+    mapMutations,
+    mapGetters
+  } from 'vuex'
   export default {
+    computed: {
+      ...mapState('cart', []),
+      ...mapGetters('cart', ['total'])
+    },
+    watch: {
+      // total(newVal) {
+      //   const findResult = this.options.find(item => item.text === '购物车')
+
+      //   if (findResult) {
+      //     findResult.info = newVal
+      //   }
+      // }
+      // 函数形式，第一次进入页面不会执行
+      total: {
+        immediate: true,
+        handler(newVal) {
+          const findResult = this.options.find(item => item.text === '购物车')
+
+          if (findResult) {
+            // if (newVal !== 0) {
+
+            findResult.info = newVal
+            // }
+          }
+        }
+      }
+    },
     data() {
       return {
         goods_info: {}, // 商品详情
@@ -60,7 +92,7 @@
         }, {
           icon: 'cart',
           text: '购物车',
-          info: 2
+          info: 0
         }],
         // 右侧加入购物车、立即购买图标
         buttonGroup: [{
@@ -82,6 +114,7 @@
       this.getGoodsDetail(goods_id)
     },
     methods: {
+      ...mapMutations('cart', ['addToCart']),
       async getGoodsDetail(goods_id) {
         const {
           data: res
@@ -106,7 +139,7 @@
         })
       },
       // 左侧店铺、购物车图标的点击事件
-      onClick (e) {
+      onClick(e) {
         console.log(e);
         if (e.content.text === '购物车') {
           uni.switchTab({
@@ -115,8 +148,22 @@
         }
       },
       // 右侧加入购物车、立即购买图标的点击事件
-      buttonClick (e) {
-        
+      buttonClick(e) {
+        // console.log(e);
+        if (e.content.text === '加入购物车') {
+          // 商品信息对象
+          // { goods_id, goods_name, goods_price, goods_count, goods_small_logo, goods_state }
+          const goods = {
+            goods_id: this.goods_info.goods_id,
+            goods_name: this.goods_info.goods_name,
+            goods_price: this.goods_info.goods_price,
+            goods_count: 1, // 默认添加商品数量为 1
+            goods_small_logo: this.goods_info.goods_small_logo,
+            goods_state: true // 默认选中状态
+          }
+
+          this.addToCart(goods)
+        }
       }
     }
   }
@@ -126,7 +173,7 @@
   page {
     background-color: #fff;
   }
-  
+
   .goods-detail-container {
     padding-bottom: 50px;
   }
@@ -182,7 +229,7 @@
       margin: 10px 0;
     }
   }
-  
+
   // 商品导航
   .goods-nav {
     position: fixed;
